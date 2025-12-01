@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Synapse</title>
     <link rel="stylesheet" href="./style/style.css">
     <script src="/socket.io/socket.io.js"></script>
-    <script src="./js/index.js" defer ></script>
+    <script src="./js/index.js" defer type="module" ></script>
 </head>
 <body>
 
@@ -14,7 +14,7 @@
 
     <div id="app">
         <aside id="left-bar">
-
+            
             <div>
                 <h2>Messages</h2>
             </div>
@@ -27,16 +27,39 @@
 
                 <ul>
                 <li>
-                    <img src="./assets/woman.png" alt="" width="40px"> <span>Eyecode Support</span>
+                    <img src="./assets/woman.png" alt="" width="40px"> <span>Synapse Support</span>
                 </li>
                 </ul>
             </div>
 
         </aside>
 
+        <aside class="right-bar-overlay">
+            <div class="right-bar">
+                
+            <div>
+                <h2>Messages</h2>
+            </div>
+
+            <div>
+                <input id="search" type="text" placeholder="Search">
+            </div>
+
+            <div id="contacts">
+
+                <ul>
+                <li>
+                    <img src="./assets/woman.png" alt="" width="40px"> <span>Synapse Support</span>
+                </li>
+                </ul>
+            </div>
+            </div>
+        </aside>
+
+
 
         <main id="chat-display">
-
+            <button id="mobile_menu"> <img src="./assets/arrow.svg" alt=""></button>
             <div id="chat-msg-dialog"></div>
             <div id="chat-display-message">
                 <input id="message-input" placeholder="Message" type="text"> <button id="send-msg"><img  src="./assets/send.svg" alt=""></button>
