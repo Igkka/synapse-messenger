@@ -5,9 +5,14 @@ const msgBox = document.querySelector("#chat-msg-dialog")
 const msgInput = document.querySelector("#message-input")
 const sendMsgBtn = document.querySelector("#send-msg")
 const mobileMenuBtn = document.querySelector("#mobile_menu")
+const audioMsgBtn = document.querySelector("#audio-msg")
+const sendAudioMsgBtn = document.querySelector("#audio-msg-notif")
 
 let user = prompt("Введите ваше имя пользователя")
 const socket = io()
+let mediaRecorder;
+let audioChunks = [];
+let isAudioRecording = false;
 
 mobileMenuBtn.addEventListener('click', ()=>{
     const aside = document.querySelector('.right-bar-overlay');
@@ -22,7 +27,7 @@ const createMessage = (msg,name) => {
 
     return(`
 
-    
+        <div class="message_data">
         <img id="user_avatar" src="./assets/user.png">
 
         <div class="message">
@@ -30,7 +35,7 @@ const createMessage = (msg,name) => {
             <p>${msg}</p>
             <div class="date">${currentDate}</div>
         </div>
-
+        </div>
         
         `)
 
@@ -52,6 +57,33 @@ const sendMessage = () => {
     msgInput.value = ""
 }
 
+const audioMessage = async () => {
+    if(isAudioRecording){
+        mediaRecorder.stop()
+        isAudioRecording = !isAudioRecording
+        sendAudioMsgBtn.classList.toggle("active")
+        return
+    }else{
+        sendAudioMsgBtn.classList.toggle("active")
+        const stream = await navigator.mediaDevices.getUserMedia({audio:true})
+        mediaRecorder = new MediaRecorder(stream)
+        mediaRecorder.ondataavailable = (e) => {
+            audioChunks.push(e.data)
+        }
+
+        mediaRecorder.onstop = async () => {
+            const blob = new Blob(audioChunks,{type:"audio/webm"});
+            audioChunks = [];
+            socket.emit("voice message",blob);
+
+        }
+
+        mediaRecorder.start()
+        isAudioRecording = !isAudioRecording
+    }
+
+}
+
 window.addEventListener("keypress",(e) => {
     let pressedKey = e.key
     if(pressedKey == "Enter"){
@@ -63,6 +95,10 @@ sendMsgBtn.addEventListener("click",() => {
     sendMessage()
 })
 
+audioMsgBtn.addEventListener("click",()=>{
+audioMessage()
+})
+
 socket.on("chat message",(data)=> {
 
     let audio = new Audio(ringtones[0])
@@ -72,4 +108,11 @@ socket.on("chat message",(data)=> {
 
     const {msg,user_name} = data
     msgBox.innerHTML += createMessage(msg,user_name)
+})
+
+socket.on("voice message",(data)=>{
+    const blob = new Blob([data],{type:"text/plain"})
+    const url = URL.createObjectURL(blob)
+    msgBox.innerHTML += `<audio class="audio_message" src="${url}" controls></audio>`
+
 })

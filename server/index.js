@@ -28,6 +28,11 @@ io.on('connection', (socket) => {
     )
   })
 
+  socket.on("voice message",(data)=>{
+    console.log(data)
+    io.emit("voice message",data)
+  })
+
 });
 
 
